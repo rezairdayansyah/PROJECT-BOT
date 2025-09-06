@@ -14,10 +14,13 @@ const SHEET_USER = 'USER';
 // === Setup bot polling ===
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// === Setup Google Sheets API ===
+// === Setup Google Sheets API dengan Service Account ===
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS || '{}');
 const auth = new google.auth.GoogleAuth({
-	scopes: ['https://www.googleapis.com/auth/spreadsheets']
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
+
 async function getSheetsClient() {
 	return google.sheets({ version: 'v4', auth: await auth.getClient() });
 }
@@ -244,3 +247,4 @@ async function handlePivot(chatId) {
 }
 
 console.log('Bot ONT polling berjalan...');
+
