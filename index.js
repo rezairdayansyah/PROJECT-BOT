@@ -3,26 +3,32 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const { google } = require('googleapis');
 
-// === Konfigurasi dari .env atau hardcode sementara ===
-const TOKEN = process.env.TELEGRAM_TOKEN || '8462418931:AAH1VhFEfrsHUIn3HA7LSeiam0SCW7bplK8';
-const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '688909275';
-const SHEET_ID = process.env.SHEET_ID || '1MEGEiAN6pyMLRKXsdqymxasOGLdLTMv7ts3LSb3C27Y';
-const SHEET_STOCK = 'STOCK ONT';
-const SHEET_MONITORING = 'NTE MONITORING';
-const SHEET_USER = 'USER';
+// === Konfigurasi dari .env atau Railway Variables ===
+const TOKEN = process.env.TELEGRAM_TOKEN;
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID;
+const SHEET_ID = process.env.SHEET_ID;
+
+// === Decode credentials dari BASE64 ===
+let credentials = {};
+try {
+  const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, "base64").toString("utf8");
+  credentials = JSON.parse(decoded);
+  console.log("✅ Google Credentials berhasil di-decode");
+} catch (err) {
+  console.error("❌ Gagal decode GOOGLE_CREDENTIALS_BASE64:", err);
+}
 
 // === Setup bot polling ===
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// === Setup Google Sheets API dengan Service Account ===
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS || '{}');
+// === Setup Google Sheets API ===
 const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
 
 async function getSheetsClient() {
-	return google.sheets({ version: 'v4', auth: await auth.getClient() });
+  return google.sheets({ version: 'v4', auth: await auth.getClient() });
 }
 
 // === Cek user di sheet USER ===
@@ -247,4 +253,5 @@ async function handlePivot(chatId) {
 }
 
 console.log('Bot ONT polling berjalan...');
+
 
