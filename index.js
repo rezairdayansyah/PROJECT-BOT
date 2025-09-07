@@ -372,3 +372,4 @@ console.log('Sheet ID:', SHEET_ID ? 'Loaded' : 'Missing');
 console.log('Admin Chat ID:', ADMIN_CHAT_ID || 'Not set');
 console.log('Google Auth:', auth ? 'Initialized' : 'Failed');
 
+
